@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatRelativeTime } from "@/lib/utils/format";
-import { BarChart3, Globe } from "lucide-react";
+import { BarChart3, Globe, Trash2 } from "lucide-react";
 
 interface ProjectCardProps {
   project: {
@@ -17,6 +18,7 @@ interface ProjectCardProps {
     created_at: string;
     updated_at: string;
   };
+  onDelete?: (id: string) => void;
 }
 
 const statusVariant: Record<string, "default" | "success" | "warning" | "secondary"> = {
@@ -26,7 +28,20 @@ const statusVariant: Record<string, "default" | "success" | "warning" | "seconda
   completed: "default",
 };
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, onDelete }: ProjectCardProps) {
+  const [confirming, setConfirming] = useState(false);
+
+  function handleDeleteClick(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (confirming) {
+      onDelete?.(project.id);
+    } else {
+      setConfirming(true);
+      setTimeout(() => setConfirming(false), 3000);
+    }
+  }
+
   return (
     <Link href={`/project/${project.id}`}>
       <Card className="hover:border-primary/50 transition-colors cursor-pointer">
@@ -38,9 +53,24 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 {project.industry || "No industry set"}
               </CardDescription>
             </div>
-            <Badge variant={statusVariant[project.status] || "secondary"}>
-              {project.status}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant={statusVariant[project.status] || "secondary"}>
+                {project.status}
+              </Badge>
+              {onDelete && (
+                <button
+                  onClick={handleDeleteClick}
+                  className={`p-1 rounded transition-colors cursor-pointer ${
+                    confirming
+                      ? "text-destructive bg-destructive/10"
+                      : "text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  }`}
+                  title={confirming ? "Click again to confirm" : "Delete project"}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>

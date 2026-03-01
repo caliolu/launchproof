@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL || "https://launchproof.com"
   ),
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

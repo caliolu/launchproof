@@ -5,8 +5,9 @@ export function MarketingHeader() {
   return (
     <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-50">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold text-primary">
-          LaunchProof
+        <Link href="/" className="flex items-center gap-2">
+          <img src="/logo.svg" alt="" className="h-8 w-8" />
+          <span className="text-xl font-bold">Launch<span className="text-primary">Proof</span></span>
         </Link>
         <nav className="hidden md:flex items-center gap-6">
           <Link href="/#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">

@@ -22,8 +22,9 @@ export function PlatformSidebar() {
   return (
     <aside className="flex flex-col w-64 border-r border-border bg-card h-screen sticky top-0">
       <div className="p-4 border-b border-border">
-        <Link href="/dashboard" className="text-xl font-bold text-primary">
-          LaunchProof
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <img src="/logo.svg" alt="" className="h-7 w-7" />
+          <span className="text-lg font-bold">Launch<span className="text-primary">Proof</span></span>
         </Link>
       </div>
 

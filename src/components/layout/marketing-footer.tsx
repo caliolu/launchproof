@@ -6,7 +6,10 @@ export function MarketingFooter() {
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <p className="font-bold text-primary mb-2">LaunchProof</p>
+            <div className="flex items-center gap-2 mb-2">
+              <img src="/logo.svg" alt="" className="h-6 w-6" />
+              <span className="font-bold">Launch<span className="text-primary">Proof</span></span>
+            </div>
             <p className="text-sm text-muted-foreground">
               Validate your startup idea in 24 hours with AI-powered tools and real market data.
             </p>

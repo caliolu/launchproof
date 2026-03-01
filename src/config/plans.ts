@@ -7,6 +7,7 @@ export interface PlanConfig {
   stripePriceId: string;
   limits: {
     projects: number;
+    maxSignups: number;
     adsEnabled: boolean;
     publishEnabled: boolean;
     customDomain: boolean;
@@ -28,6 +29,7 @@ export const plans: PlanConfig[] = [
     stripePriceId: "",
     limits: {
       projects: 1,
+      maxSignups: 0,
       adsEnabled: false,
       publishEnabled: false,
       customDomain: false,
@@ -51,6 +53,7 @@ export const plans: PlanConfig[] = [
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || "",
     limits: {
       projects: 1,
+      maxSignups: 100,
       adsEnabled: true,
       publishEnabled: true,
       customDomain: false,
@@ -64,7 +67,7 @@ export const plans: PlanConfig[] = [
       "Landing page generation + publish",
       "AI Ad Strategist",
       "Advanced analytics",
-      "Unlimited signups",
+      "Up to 100 signups",
       "CSV export",
     ],
     popular: true,
@@ -78,6 +81,7 @@ export const plans: PlanConfig[] = [
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "",
     limits: {
       projects: Infinity,
+      maxSignups: Infinity,
       adsEnabled: true,
       publishEnabled: true,
       customDomain: true,

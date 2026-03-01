@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit } from "@/lib/utils/rate-limit";
 import { sendSignupNotification } from "@/lib/services/email";
+import { getPlan } from "@/config/plans";
 
 // POST: Record a signup (public, no auth)
 export async function POST(request: NextRequest) {
@@ -26,15 +27,34 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Verify landing page is published
+    // Verify landing page is published and get owner info
     const { data: page } = await supabase
       .from("landing_pages")
-      .select("id, is_published")
+      .select("id, is_published, user_id")
       .eq("id", landingPageId)
       .single();
 
     if (!page?.is_published) {
       return Response.json({ error: "Page not found" }, { status: 404 });
+    }
+
+    // Check signup limit based on owner's plan
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan")
+      .eq("id", page.user_id)
+      .single();
+
+    const plan = getPlan(profile?.plan || "free");
+    if (plan.limits.maxSignups < Infinity) {
+      const { count } = await supabase
+        .from("signups")
+        .select("*", { count: "exact", head: true })
+        .eq("project_id", projectId);
+
+      if ((count || 0) >= plan.limits.maxSignups) {
+        return Response.json({ error: "Signup limit reached" }, { status: 403 });
+      }
     }
 
     const ipCountry = request.headers.get("x-vercel-ip-country") || null;

@@ -52,11 +52,9 @@ export async function POST(request: NextRequest) {
         .select("*", { count: "exact", head: true })
         .eq("project_id", projectId);
 
-      if ((count || 0) >= plan.limits.maxSignups) {
-        // Return success to visitor (good UX) but don't store the signup
-        // Project owner won't see it until they upgrade
-        return Response.json({ message: "Signup recorded" }, { status: 201 });
-      }
+      // Always store signups regardless of plan limit.
+      // Owner only sees up to their plan's limit in the dashboard.
+      // Upgrading to Pro reveals all collected signups.
     }
 
     const ipCountry = request.headers.get("x-vercel-ip-country") || null;

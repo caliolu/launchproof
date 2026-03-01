@@ -14,11 +14,10 @@ interface Signup {
 
 interface SignupTableProps {
   signups: Signup[];
-  maxSignups?: number;
+  hiddenCount?: number;
 }
 
-export function SignupTable({ signups, maxSignups }: SignupTableProps) {
-  const atLimit = maxSignups !== undefined && maxSignups < Infinity && signups.length >= maxSignups;
+export function SignupTable({ signups, hiddenCount = 0 }: SignupTableProps) {
   if (signups.length === 0) {
     return (
       <p className="text-sm text-muted-foreground text-center py-8">
@@ -29,10 +28,10 @@ export function SignupTable({ signups, maxSignups }: SignupTableProps) {
 
   return (
     <div className="overflow-x-auto">
-      {atLimit && (
+      {hiddenCount > 0 && (
         <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800 flex items-center justify-between">
-          <span>You&apos;ve reached your plan&apos;s signup limit ({maxSignups}). New signups are no longer being recorded.</span>
-          <a href="/settings/billing" className="font-medium underline whitespace-nowrap ml-4">Upgrade plan</a>
+          <span>+{hiddenCount} more signup{hiddenCount > 1 ? "s" : ""} collected! Upgrade to Pro to unlock all your signups.</span>
+          <a href="/settings/billing" className="font-medium underline whitespace-nowrap ml-4">Upgrade</a>
         </div>
       )}
       <table className="w-full text-sm">

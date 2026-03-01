@@ -53,7 +53,9 @@ export async function POST(request: NextRequest) {
         .eq("project_id", projectId);
 
       if ((count || 0) >= plan.limits.maxSignups) {
-        return Response.json({ error: "Signup limit reached" }, { status: 403 });
+        // Return success to visitor (good UX) but don't store the signup
+        // Project owner won't see it until they upgrade
+        return Response.json({ message: "Signup recorded" }, { status: 201 });
       }
     }
 

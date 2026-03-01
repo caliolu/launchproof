@@ -6,7 +6,7 @@ import { TemplatePicker } from "./template-picker";
 import { ContentEditor } from "./content-editor";
 import { LandingPreview } from "../preview/landing-preview";
 import { Badge } from "@/components/ui/badge";
-import { Save, Globe, Eye } from "lucide-react";
+import { Save, Globe, Eye, Lock } from "lucide-react";
 import type { LandingPageContent, ColorScheme, TemplateId } from "@/types/landing-page";
 
 interface LandingEditorProps {
@@ -16,6 +16,7 @@ interface LandingEditorProps {
   initialColors: ColorScheme;
   isPublished: boolean;
   slug: string;
+  canPublish: boolean;
   onSave: (data: { template: TemplateId; content: LandingPageContent; color_scheme: ColorScheme }) => Promise<void>;
   onPublish: () => Promise<void>;
   onUnpublish: () => Promise<void>;
@@ -27,6 +28,7 @@ export function LandingEditor({
   initialColors,
   isPublished,
   slug,
+  canPublish,
   onSave,
   onPublish,
   onUnpublish,
@@ -69,10 +71,19 @@ export function LandingEditor({
             <Save className="h-4 w-4" />
             Save changes
           </Button>
-          <Button onClick={handlePublish} loading={publishing} className="w-full">
-            <Globe className="h-4 w-4" />
-            {isPublished ? "Unpublish" : "Publish"}
-          </Button>
+          {canPublish ? (
+            <Button onClick={handlePublish} loading={publishing} className="w-full">
+              <Globe className="h-4 w-4" />
+              {isPublished ? "Unpublish" : "Publish"}
+            </Button>
+          ) : (
+            <a href="/settings/billing" className="block">
+              <Button variant="outline" className="w-full" type="button">
+                <Lock className="h-4 w-4" />
+                Upgrade to publish
+              </Button>
+            </a>
+          )}
           {isPublished && (
             <a
               href={`/lp/${slug}`}

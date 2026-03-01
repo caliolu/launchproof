@@ -10,6 +10,7 @@ interface PublicLandingPageProps {
   template: TemplateId;
   content: Record<string, unknown>;
   colors: Record<string, string>;
+  showWatermark?: boolean;
 }
 
 export function PublicLandingPage({
@@ -18,6 +19,7 @@ export function PublicLandingPage({
   template,
   content,
   colors,
+  showWatermark = false,
 }: PublicLandingPageProps) {
   const [submitted, setSubmitted] = useState(false);
 
@@ -73,11 +75,23 @@ export function PublicLandingPage({
   }
 
   return (
-    <TemplateRenderer
-      template={template}
-      content={content as unknown as LandingPageContent}
-      colors={colors as unknown as ColorScheme}
-      onSignup={handleSignup}
-    />
+    <>
+      <TemplateRenderer
+        template={template}
+        content={content as unknown as LandingPageContent}
+        colors={colors as unknown as ColorScheme}
+        onSignup={handleSignup}
+      />
+      {showWatermark && (
+        <a
+          href="https://launchproof.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-4 right-4 bg-black/80 text-white text-xs px-3 py-1.5 rounded-full shadow-lg hover:bg-black/90 transition-colors z-50"
+        >
+          Built with LaunchProof
+        </a>
+      )}
+    </>
   );
 }

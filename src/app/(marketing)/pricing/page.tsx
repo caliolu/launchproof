@@ -27,7 +27,7 @@ export default function PricingPage() {
           {[
             {
               q: "Can I use LaunchProof for free?",
-              a: "Yes! The free plan lets you create 1 project with full AI coach, landing page, and analytics features.",
+              a: "Yes! The free plan lets you create 1 project with AI coach and landing page preview. Upgrade to Starter to publish your page and start collecting signups.",
             },
             {
               q: "What happens when my test is complete?",

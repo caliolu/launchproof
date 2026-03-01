@@ -8,7 +8,9 @@ export interface PlanConfig {
   limits: {
     projects: number;
     adsEnabled: boolean;
+    publishEnabled: boolean;
     customDomain: boolean;
+    watermark: boolean;
     analytics: "basic" | "advanced";
     support: "community" | "email" | "priority";
   };
@@ -27,16 +29,17 @@ export const plans: PlanConfig[] = [
     limits: {
       projects: 1,
       adsEnabled: false,
+      publishEnabled: false,
       customDomain: false,
+      watermark: true,
       analytics: "basic",
       support: "community",
     },
     features: [
       "1 validation test",
       "AI Idea Coach",
-      "Landing page generation",
+      "Landing page preview",
       "Basic analytics",
-      "Up to 100 signups",
     ],
   },
   {
@@ -49,14 +52,16 @@ export const plans: PlanConfig[] = [
     limits: {
       projects: 1,
       adsEnabled: true,
+      publishEnabled: true,
       customDomain: false,
+      watermark: true,
       analytics: "advanced",
       support: "email",
     },
     features: [
       "1 validation test",
       "AI Idea Coach",
-      "Landing page generation",
+      "Landing page generation + publish",
       "AI Ad Strategist",
       "Advanced analytics",
       "Unlimited signups",
@@ -74,18 +79,21 @@ export const plans: PlanConfig[] = [
     limits: {
       projects: Infinity,
       adsEnabled: true,
+      publishEnabled: true,
       customDomain: true,
+      watermark: false,
       analytics: "advanced",
       support: "priority",
     },
     features: [
       "Unlimited validation tests",
       "AI Idea Coach",
-      "Landing page generation",
+      "Landing page generation + publish",
       "AI Ad Strategist",
       "Advanced analytics",
       "Unlimited signups",
       "CSV export",
+      "No watermark",
       "Custom domains",
       "Priority support",
     ],

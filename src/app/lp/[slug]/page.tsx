@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PublicLandingPage } from "./public-landing-page";
+import { getPlan } from "@/config/plans";
 import type { Metadata } from "next";
 
 interface Props {
@@ -43,6 +44,16 @@ export default async function LandingPage({ params }: Props) {
 
   if (!page) notFound();
 
+  // Check if the page owner's plan requires a watermark
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", page.user_id)
+    .single();
+
+  const plan = getPlan(profile?.plan || "free");
+  const showWatermark = plan.limits.watermark;
+
   return (
     <PublicLandingPage
       landingPageId={page.id}
@@ -50,6 +61,7 @@ export default async function LandingPage({ params }: Props) {
       template={page.template as "minimal" | "bold" | "corporate" | "dark"}
       content={page.content as Record<string, unknown>}
       colors={page.color_scheme as Record<string, string>}
+      showWatermark={showWatermark}
     />
   );
 }

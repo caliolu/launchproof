@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { errorResponse, AuthError, NotFoundError } from "@/lib/utils/errors";
+import { errorResponse, AuthError, NotFoundError, ForbiddenError } from "@/lib/utils/errors";
+import { getPlan } from "@/config/plans";
 
 export async function POST(
   _request: NextRequest,
@@ -11,6 +12,18 @@ export async function POST(
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new AuthError();
+
+    // Check if user's plan allows publishing
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan")
+      .eq("id", user.id)
+      .single();
+
+    const plan = getPlan(profile?.plan || "free");
+    if (!plan.limits.publishEnabled) {
+      throw new ForbiddenError("Upgrade to Starter or Pro to publish your landing page");
+    }
 
     const { data, error } = await supabase
       .from("landing_pages")

@@ -9,6 +9,7 @@ import { LoadingState } from "@/components/shared/loading-state";
 import { Button } from "@/components/ui/button";
 import { Globe, Sparkles } from "lucide-react";
 import type { LandingPageContent, ColorScheme, TemplateId } from "@/types/landing-page";
+import { getPlan } from "@/config/plans";
 
 export default function LandingPageEditorPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -16,10 +17,23 @@ export default function LandingPageEditorPage() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [hasIdea, setHasIdea] = useState(false);
+  const [canPublish, setCanPublish] = useState(false);
 
   useEffect(() => {
     async function load() {
       const supabase = createClient();
+
+      // Check user's plan for publish permission
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("plan")
+          .eq("id", user.id)
+          .single();
+        const plan = getPlan(profile?.plan || "free");
+        setCanPublish(plan.limits.publishEnabled);
+      }
 
       // Check if project has idea summary
       const { data: project } = await supabase
@@ -132,6 +146,7 @@ export default function LandingPageEditorPage() {
       initialColors={landingPage.color_scheme as unknown as ColorScheme}
       isPublished={landingPage.is_published as boolean}
       slug={landingPage.slug as string}
+      canPublish={canPublish}
       onSave={handleSave}
       onPublish={handlePublish}
       onUnpublish={handleUnpublish}

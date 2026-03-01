@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { formatRelativeTime } from "@/lib/utils/format";
 import { BarChart3, Globe, Trash2 } from "lucide-react";
 
@@ -29,17 +30,18 @@ const statusVariant: Record<string, "default" | "success" | "warning" | "seconda
 };
 
 export function ProjectCard({ project, onDelete }: ProjectCardProps) {
-  const [confirming, setConfirming] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   function handleDeleteClick(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (confirming) {
-      onDelete?.(project.id);
-    } else {
-      setConfirming(true);
-      setTimeout(() => setConfirming(false), 3000);
-    }
+    setShowConfirm(true);
+  }
+
+  async function handleConfirmDelete() {
+    setDeleting(true);
+    onDelete?.(project.id);
   }
 
   return (
@@ -60,12 +62,8 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
               {onDelete && (
                 <button
                   onClick={handleDeleteClick}
-                  className={`p-1 rounded transition-colors cursor-pointer ${
-                    confirming
-                      ? "text-destructive bg-destructive/10"
-                      : "text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                  }`}
-                  title={confirming ? "Click again to confirm" : "Delete project"}
+                  className="p-1 rounded transition-colors cursor-pointer text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  title="Delete project"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -91,6 +89,18 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
           </div>
         </CardContent>
       </Card>
+      {onDelete && (
+        <ConfirmDialog
+          open={showConfirm}
+          onClose={() => setShowConfirm(false)}
+          onConfirm={handleConfirmDelete}
+          title="Delete project"
+          description={`"${project.name}" and all its data (landing page, signups, chat history) will be permanently deleted.`}
+          confirmLabel="Delete"
+          destructive
+          loading={deleting}
+        />
+      )}
     </Link>
   );
 }

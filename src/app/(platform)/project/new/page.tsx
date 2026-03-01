@@ -11,6 +11,7 @@ import { generateUniqueSlug } from "@/lib/utils/slugify";
 
 export default function NewProjectPage() {
   const [name, setName] = useState("");
+  const [idea, setIdea] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -41,7 +42,9 @@ export default function NewProjectPage() {
       return;
     }
 
-    router.push(`/project/${data.id}/chat`);
+    // Pass idea description as query param so chat can use it as first message
+    const params = idea.trim() ? `?idea=${encodeURIComponent(idea.trim())}` : "";
+    router.push(`/project/${data.id}/chat${params}`);
   }
 
   return (
@@ -78,6 +81,22 @@ export default function NewProjectPage() {
                 />
                 <p className="text-xs text-muted-foreground">
                   This is just for you — visitors won&apos;t see this name.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="idea" className="text-sm font-medium">
+                  Describe your idea
+                </label>
+                <textarea
+                  id="idea"
+                  className="flex w-full rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[80px] resize-none"
+                  placeholder="e.g. An app that calls elderly parents daily using AI to check on their health and mood, then sends a summary to their children..."
+                  value={idea}
+                  onChange={(e) => setIdea(e.target.value)}
+                  maxLength={500}
+                />
+                <p className="text-xs text-muted-foreground">
+                  The AI Coach will use this to start the conversation.
                 </p>
               </div>
               <Button type="submit" className="w-full" loading={loading}>

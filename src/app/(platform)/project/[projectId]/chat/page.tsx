@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ChatInterface } from "@/components/chat/chat-interface";
 import { LoadingState } from "@/components/shared/loading-state";
@@ -9,6 +9,8 @@ import { LoadingState } from "@/components/shared/loading-state";
 export default function ChatPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const ideaFromQuery = searchParams.get("idea");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [initialMessages, setInitialMessages] = useState<
     Array<{ role: "user" | "assistant"; content: string }>
@@ -64,6 +66,7 @@ export default function ChatPage() {
       projectId={projectId}
       sessionId={sessionId}
       initialMessages={initialMessages}
+      initialIdea={ideaFromQuery || undefined}
       onExtractionComplete={handleExtractionComplete}
     />
   );

@@ -13,6 +13,7 @@ interface ChatInterfaceProps {
   projectId: string;
   sessionId?: string | null;
   initialMessages?: Array<{ role: "user" | "assistant"; content: string }>;
+  initialIdea?: string;
   onExtractionComplete?: (data: IdeaSummary) => void;
 }
 
@@ -20,6 +21,7 @@ export function ChatInterface({
   projectId,
   sessionId: initialSessionId,
   initialMessages,
+  initialIdea,
   onExtractionComplete,
 }: ChatInterfaceProps) {
   const {
@@ -37,6 +39,8 @@ export function ChatInterface({
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const ideaSentRef = useRef(false);
+
   useEffect(() => {
     if (initialMessages?.length) {
       setMessages(
@@ -47,6 +51,10 @@ export function ChatInterface({
           createdAt: new Date().toISOString(),
         }))
       );
+    } else if (initialIdea && !ideaSentRef.current) {
+      // Auto-send the idea as the first message
+      ideaSentRef.current = true;
+      sendMessage(initialIdea);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

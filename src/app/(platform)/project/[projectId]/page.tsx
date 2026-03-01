@@ -14,7 +14,8 @@ export default function ProjectDashboardPage() {
   if (loading) return <LoadingState message="Loading project..." />;
   if (!project) return <div className="p-6">Project not found.</div>;
 
-  const score = project.validation_score ?? 0;
+  const score = project.validation_score;
+  const hasScore = score !== null && score !== undefined;
 
   return (
     <div className="p-6 space-y-6">
@@ -36,44 +37,50 @@ export default function ProjectDashboardPage() {
           <CardTitle className="text-base">Validation Score</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-6">
-            <div className="relative w-24 h-24">
-              <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="42"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  className="text-muted"
-                />
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="42"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  strokeDasharray={`${score * 2.64} 264`}
-                  strokeLinecap="round"
-                  className="text-primary"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-bold">{score}</span>
+          {hasScore ? (
+            <div className="flex items-center gap-6">
+              <div className="relative w-24 h-24">
+                <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    className="text-muted"
+                  />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    strokeDasharray={`${score * 2.64} 264`}
+                    strokeLinecap="round"
+                    className="text-primary"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl font-bold">{score}</span>
+                </div>
               </div>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {score === 0
-                ? "No data yet. Publish your landing page and drive traffic to see your score."
-                : score >= 70
+              <div className="text-sm text-muted-foreground">
+                {score >= 70
                   ? "Strong signal! Your idea has good traction."
                   : score >= 40
                     ? "Mixed signals. Consider iterating on your messaging."
-                    : "Weak signal. Consider pivoting or adjusting your target audience."}
+                    : score > 0
+                      ? "Early data coming in. Keep driving traffic for more accurate results."
+                      : "No conversions yet. Keep driving traffic to your landing page."}
+              </div>
             </div>
-          </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No data yet. Publish your landing page and drive traffic to see your validation score.
+            </p>
+          )}
         </CardContent>
       </Card>
 

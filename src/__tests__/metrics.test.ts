@@ -44,14 +44,14 @@ describe("Validation score edge cases", () => {
     }
   });
 
-  it("engagement defaults to 50 without optional data", () => {
+  it("engagement is 0 without optional data", () => {
     const result = calculateValidationScore({
       totalPageViews: 100,
       totalUniqueVisitors: 50,
       totalSignups: 5,
       conversionRate: 5,
     });
-    expect(result.engagement).toBe(50);
+    expect(result.engagement).toBe(0);
   });
 
   it("engagement adjusts with avgTimeOnPage", () => {

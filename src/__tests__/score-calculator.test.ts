@@ -2,18 +2,17 @@ import { describe, it, expect } from "vitest";
 import { calculateValidationScore } from "@/lib/validation/score-calculator";
 
 describe("calculateValidationScore", () => {
-  it("returns baseline score for no data (engagement defaults to 50)", () => {
+  it("returns zero for no data", () => {
     const result = calculateValidationScore({
       totalPageViews: 0,
       totalUniqueVisitors: 0,
       totalSignups: 0,
       conversionRate: 0,
     });
-    // engagement defaults to 50 when no data, so total = 50*0.2 = 10
-    expect(result.total).toBe(10);
+    expect(result.total).toBe(0);
     expect(result.conversion).toBe(0);
     expect(result.traffic).toBe(0);
-    expect(result.engagement).toBe(50);
+    expect(result.engagement).toBe(0);
     expect(result.quality).toBe(0);
   });
 
@@ -69,15 +68,15 @@ describe("calculateValidationScore", () => {
 
   it("weights are applied correctly (conversion 40%, traffic 25%, engagement 20%, quality 15%)", () => {
     const result = calculateValidationScore({
-      totalPageViews: 0,
-      totalUniqueVisitors: 0,
-      totalSignups: 0,
-      conversionRate: 0,
+      totalPageViews: 200,
+      totalUniqueVisitors: 100,
+      totalSignups: 10,
+      conversionRate: 5,
+      avgTimeOnPage: 60,
     });
-    // With no data: conversion=0, traffic=0, engagement=50 (default), quality=0
-    // total = 0*0.4 + 0*0.25 + 50*0.2 + 0*0.15 = 10
-    expect(result.total).toBe(10);
-    expect(result.engagement).toBe(50);
+    // conversion=70, traffic=50, engagement=70, quality=50
+    // total = 70*0.4 + 50*0.25 + 70*0.2 + 50*0.15 = 28+12.5+14+7.5 = 62
+    expect(result.total).toBe(62);
   });
 
   it("gives signup bonus for high signup counts", () => {

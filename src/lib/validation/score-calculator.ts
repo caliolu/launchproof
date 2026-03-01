@@ -64,7 +64,7 @@ function calculateTrafficScore(pageViews: number, uniqueVisitors: number): numbe
 }
 
 function calculateEngagementScore(avgTimeOnPage?: number, bounceRate?: number): number {
-  let score = 50; // Default when no data
+  let score = 0; // No data = no score
 
   if (avgTimeOnPage !== undefined) {
     if (avgTimeOnPage >= 120) score = 90;

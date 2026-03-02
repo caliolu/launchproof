@@ -3,6 +3,7 @@ import { requirePro } from "@/lib/utils/require-pro";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit } from "@/lib/utils/rate-limit";
 import { runScan } from "@/lib/services/scanner/scan-orchestrator";
+import { RATE_LIMITS } from "@/config/scanner";
 import type { ScanConfig, ScanType, ScanProgressEvent } from "@/types/scanner";
 
 export const maxDuration = 300;
@@ -11,7 +12,7 @@ export async function POST(request: NextRequest) {
   const { authorized, user, error } = await requirePro();
   if (!authorized || !user) return error!;
 
-  // Rate limit: 1 scan/hour, 3/day
+  // Rate limit: 1 scan/hour (in-memory)
   const hourlyCheck = rateLimit(`scan:hourly:${user.id}`, 1, 3600000);
   if (!hourlyCheck.success) {
     return Response.json(
@@ -20,10 +21,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const dailyCheck = rateLimit(`scan:daily:${user.id}`, 3, 86400000);
-  if (!dailyCheck.success) {
+  // Monthly limit: check from database
+  const adminClient = createAdminClient();
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const { count } = await adminClient
+    .from("scan_jobs")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .gte("created_at", monthStart.toISOString());
+
+  if ((count || 0) >= RATE_LIMITS.scansPerMonth) {
     return Response.json(
-      { error: "You've reached your daily scan limit (3/day)" },
+      { error: `You've reached your monthly scan limit (${RATE_LIMITS.scansPerMonth}/month)` },
       { status: 429 }
     );
   }
@@ -53,7 +65,6 @@ export async function POST(request: NextRequest) {
   };
 
   // Create scan job
-  const adminClient = createAdminClient();
   const { data: scanJob, error: insertError } = await adminClient
     .from("scan_jobs")
     .insert({

@@ -48,7 +48,7 @@ export const SCORING_WEIGHTS = {
 
 export const RATE_LIMITS = {
   scansPerHour: 1,
-  scansPerDay: 3,
+  scansPerMonth: 10,
 };
 
 export const SCRAPER_CONFIG = {

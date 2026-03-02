@@ -15,7 +15,7 @@ export interface PlanConfig {
     analytics: "basic" | "advanced";
     support: "community" | "email" | "priority";
     marketResearch: boolean;
-    scansPerDay: number;
+    scansPerMonth: number;
   };
   features: string[];
   popular?: boolean;
@@ -39,7 +39,7 @@ export const plans: PlanConfig[] = [
       analytics: "basic",
       support: "community",
       marketResearch: false,
-      scansPerDay: 0,
+      scansPerMonth: 0,
     },
     features: [
       "1 validation test",
@@ -65,7 +65,7 @@ export const plans: PlanConfig[] = [
       analytics: "advanced",
       support: "email",
       marketResearch: false,
-      scansPerDay: 0,
+      scansPerMonth: 0,
     },
     features: [
       "1 validation test",
@@ -95,7 +95,7 @@ export const plans: PlanConfig[] = [
       analytics: "advanced",
       support: "priority",
       marketResearch: true,
-      scansPerDay: 3,
+      scansPerMonth: 10,
     },
     features: [
       "Unlimited validation tests",

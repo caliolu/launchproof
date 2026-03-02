@@ -14,91 +14,164 @@ export interface RawReview {
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/**
- * Scrape reviews for a competitor product from a specific platform.
- * Falls back to mock data if scraping fails (blocked, rate limited, etc.)
- */
-async function scrapeG2(productName: string): Promise<RawReview[]> {
-  // G2 has anti-scraping measures. In production, use ScrapingBee/Apify API.
-  // For now, return empty with a warning so the pipeline can still process.
-  console.warn(`G2 scraping for "${productName}" requires API key. Using empty results.`);
-  return [];
+// --- Apify Actor Definitions ---
+
+const APIFY_ACTORS: Record<ReviewPlatform, { actorId: string; buildInput: (product: string) => Record<string, unknown> }> = {
+  g2: {
+    actorId: "focused_vanguard/g2-reviews-scraper",
+    buildInput: (product) => ({
+      productUrl: `https://www.g2.com/products/${slugify(product)}/reviews`,
+      maxReviews: 20,
+      minRating: 1,
+      maxRating: 3,
+    }),
+  },
+  capterra: {
+    actorId: "imadjourney/capterra-reviews-scraper",
+    buildInput: (product) => ({
+      urls: [`https://www.capterra.com/p/search/?q=${encodeURIComponent(product)}`],
+      maxReviews: 20,
+    }),
+  },
+  trustpilot: {
+    actorId: "yin/trustpilot-scraper",
+    buildInput: (product) => ({
+      urls: [`https://www.trustpilot.com/review/${slugify(product)}.com`],
+      maxReviews: 20,
+    }),
+  },
+  producthunt: {
+    actorId: "omkar-cloud/producthunt-scraper",
+    buildInput: (product) => ({
+      queries: [product],
+      maxResults: 20,
+    }),
+  },
+};
+
+function slugify(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-async function scrapeCapterra(productName: string): Promise<RawReview[]> {
-  console.warn(`Capterra scraping for "${productName}" requires API key. Using empty results.`);
-  return [];
-}
+// --- Apify API ---
 
-async function scrapeProductHunt(productName: string): Promise<RawReview[]> {
-  // Product Hunt GraphQL API is public for reading
+async function runApifyActor(
+  actorId: string,
+  input: Record<string, unknown>,
+  timeoutSecs: number = 120
+): Promise<Record<string, unknown>[]> {
+  const token = process.env.APIFY_API_TOKEN;
+  if (!token) {
+    console.warn("APIFY_API_TOKEN not set — skipping review scraping");
+    return [];
+  }
+
   try {
-    const searchUrl = `https://www.producthunt.com/frontend/graphql`;
+    // Run actor synchronously and get dataset items
+    const actorPath = actorId.replace("/", "~");
+    const url = `https://api.apify.com/v2/acts/${actorPath}/run-sync-get-dataset-items?token=${token}&timeout=${timeoutSecs}`;
 
-    const res = await fetch(searchUrl, {
+    const res = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        query: `query { posts(topic: "${productName}", first: 10) { edges { node { id name tagline votesCount reviewsRating reviews(first: 10) { edges { node { id body rating user { name } createdAt } } } } } } }`,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
     });
 
     if (!res.ok) {
-      console.warn(`Product Hunt API error: ${res.status}`);
+      const text = await res.text().catch(() => "");
+      console.warn(`Apify actor ${actorId} failed: ${res.status} ${text.slice(0, 200)}`);
       return [];
     }
 
-    const data = await res.json();
-    const reviews: RawReview[] = [];
-
-    const posts = data?.data?.posts?.edges || [];
-    for (const post of posts) {
-      const product = post.node;
-      const productReviews = product.reviews?.edges || [];
-      for (const rev of productReviews) {
-        const review = rev.node;
-        if (review.rating && review.rating <= 3) {
-          reviews.push({
-            platform: "producthunt",
-            product_name: product.name,
-            reviewer_name: review.user?.name || null,
-            rating: review.rating,
-            review_title: null,
-            review_body: review.body,
-            review_url: null,
-            review_date: review.createdAt,
-          });
-        }
-      }
-    }
-
-    return reviews;
+    const items = await res.json();
+    return Array.isArray(items) ? items : [];
   } catch (error) {
-    console.warn("Product Hunt scraping failed:", error);
+    console.error(`Apify actor ${actorId} error:`, error);
     return [];
   }
 }
 
-async function scrapeTrustpilot(productName: string): Promise<RawReview[]> {
-  console.warn(`Trustpilot scraping for "${productName}" requires API key. Using empty results.`);
-  return [];
+// --- Platform-specific parsers ---
+
+function parseG2Results(items: Record<string, unknown>[], productName: string): RawReview[] {
+  return items
+    .filter((item) => item.reviewBody || item.body || item.text)
+    .map((item) => ({
+      platform: "g2" as ReviewPlatform,
+      product_name: (item.productName as string) || productName,
+      reviewer_name: (item.reviewerName as string) || (item.author as string) || null,
+      rating: typeof item.rating === "number" ? item.rating : typeof item.starRating === "number" ? item.starRating : null,
+      review_title: (item.reviewTitle as string) || (item.title as string) || null,
+      review_body: ((item.reviewBody as string) || (item.body as string) || (item.text as string) || "").slice(0, 3000),
+      review_url: (item.url as string) || (item.reviewUrl as string) || null,
+      review_date: (item.date as string) || (item.publishedAt as string) || null,
+    }));
 }
 
-const platformScrapers: Record<ReviewPlatform, (product: string) => Promise<RawReview[]>> = {
-  g2: scrapeG2,
-  capterra: scrapeCapterra,
-  producthunt: scrapeProductHunt,
-  trustpilot: scrapeTrustpilot,
+function parseCapterraResults(items: Record<string, unknown>[], productName: string): RawReview[] {
+  return items
+    .filter((item) => item.review || item.body || item.text || item.cons)
+    .map((item) => ({
+      platform: "capterra" as ReviewPlatform,
+      product_name: (item.productName as string) || productName,
+      reviewer_name: (item.reviewerName as string) || (item.author as string) || null,
+      rating: typeof item.overallRating === "number" ? item.overallRating : typeof item.rating === "number" ? item.rating : null,
+      review_title: (item.title as string) || (item.headline as string) || null,
+      review_body: ((item.cons as string) || (item.review as string) || (item.body as string) || (item.text as string) || "").slice(0, 3000),
+      review_url: (item.url as string) || null,
+      review_date: (item.date as string) || (item.publishedAt as string) || null,
+    }));
+}
+
+function parseTrustpilotResults(items: Record<string, unknown>[], productName: string): RawReview[] {
+  return items
+    .filter((item) => item.text || item.body || item.reviewBody)
+    .map((item) => ({
+      platform: "trustpilot" as ReviewPlatform,
+      product_name: (item.companyName as string) || productName,
+      reviewer_name: (item.reviewerName as string) || (item.name as string) || (item.author as string) || null,
+      rating: typeof item.rating === "number" ? item.rating : typeof item.stars === "number" ? item.stars : null,
+      review_title: (item.title as string) || null,
+      review_body: ((item.text as string) || (item.body as string) || (item.reviewBody as string) || "").slice(0, 3000),
+      review_url: (item.url as string) || null,
+      review_date: (item.date as string) || (item.publishedAt as string) || (item.dateOfExperience as string) || null,
+    }));
+}
+
+function parseProductHuntResults(items: Record<string, unknown>[], productName: string): RawReview[] {
+  return items
+    .filter((item) => item.review || item.body || item.text || item.tagline)
+    .map((item) => ({
+      platform: "producthunt" as ReviewPlatform,
+      product_name: (item.name as string) || productName,
+      reviewer_name: (item.reviewerName as string) || (item.makerName as string) || null,
+      rating: typeof item.rating === "number" ? item.rating : typeof item.votesCount === "number" ? Math.min(5, Math.ceil(item.votesCount / 100)) : null,
+      review_title: (item.tagline as string) || (item.title as string) || null,
+      review_body: ((item.review as string) || (item.body as string) || (item.text as string) || (item.description as string) || "").slice(0, 3000),
+      review_url: (item.url as string) || null,
+      review_date: (item.date as string) || (item.createdAt as string) || null,
+    }));
+}
+
+const parsers: Record<ReviewPlatform, (items: Record<string, unknown>[], product: string) => RawReview[]> = {
+  g2: parseG2Results,
+  capterra: parseCapterraResults,
+  trustpilot: parseTrustpilotResults,
+  producthunt: parseProductHuntResults,
 };
+
+// --- Main export ---
 
 export async function scrapeReviews(
   competitors: string[],
   platforms: ReviewPlatform[],
   onProgress?: (message: string, current: number, total: number) => void
 ): Promise<RawReview[]> {
+  if (!process.env.APIFY_API_TOKEN) {
+    onProgress?.("Skipping reviews — APIFY_API_TOKEN not configured", 0, 0);
+    return [];
+  }
+
   const allReviews: RawReview[] = [];
   const config = SCRAPER_CONFIG.reviews;
   const totalSteps = competitors.length * platforms.length;
@@ -108,15 +181,28 @@ export async function scrapeReviews(
     for (const platform of platforms) {
       currentStep++;
       onProgress?.(
-        `Scanning ${platform} for "${competitor}"...`,
+        `Scraping ${platform} for "${competitor}"...`,
         currentStep,
         totalSteps
       );
 
       try {
-        const scraper = platformScrapers[platform];
-        const reviews = await scraper(competitor);
-        allReviews.push(...reviews.slice(0, config.maxReviewsPerProduct));
+        const actorDef = APIFY_ACTORS[platform];
+        const input = actorDef.buildInput(competitor);
+        const items = await runApifyActor(actorDef.actorId, input);
+
+        const parser = parsers[platform];
+        const reviews = parser(items, competitor);
+
+        // Only keep negative/critical reviews (rating <= 3 or unknown)
+        const filtered = reviews.filter((r) => r.rating === null || r.rating <= 3);
+        allReviews.push(...filtered.slice(0, config.maxReviewsPerProduct));
+
+        onProgress?.(
+          `Found ${filtered.length} reviews from ${platform} for "${competitor}"`,
+          currentStep,
+          totalSteps
+        );
       } catch (error) {
         console.warn(`Review scraping failed for ${competitor} on ${platform}:`, error);
       }

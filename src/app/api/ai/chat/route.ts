@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { streamChat } from "@/lib/ai/claude-client";
-import { coachSystemPrompt } from "@/lib/ai/prompts/coach-system";
+import { phasePrompts, TOTAL_PHASES } from "@/lib/ai/prompts/coach-phases";
 import { extractIdeaDetailsTool } from "@/lib/ai/tools/idea-extraction";
 import { ideaSummarySchema } from "@/lib/ai/schemas/idea-schema";
 import type { MessageParam } from "@anthropic-ai/sdk/resources/messages";
@@ -49,6 +49,41 @@ export async function POST(request: NextRequest) {
     content: m.content,
   }));
 
+  // Determine current phase from number of user messages
+  // Phase 1: 1st user msg, Phase 2: 2nd user msg, ... Phase 6: 6th user msg (extraction)
+  const userMessageCount = messages.filter((m) => m.role === "user").length;
+  const currentPhase = Math.min(userMessageCount, TOTAL_PHASES);
+  let systemPrompt = phasePrompts[currentPhase] || phasePrompts[TOTAL_PHASES];
+
+  // Inject market intelligence context if available
+  const { data: marketResearch } = await supabase
+    .from("project_market_research")
+    .select("relevance_score, relevance_explanation, recommendation, opportunities(title, composite_score)")
+    .eq("project_id", projectId)
+    .gte("relevance_score", 50)
+    .order("relevance_score", { ascending: false })
+    .limit(5);
+
+  if (marketResearch && marketResearch.length > 0) {
+    const marketContext = marketResearch
+      .map((r) => {
+        const opp = r.opportunities as { title?: string; composite_score?: number } | null;
+        return `- ${opp?.title || "Unknown"} (relevance: ${Math.round(r.relevance_score)}%, market score: ${opp?.composite_score || 0}): ${r.relevance_explanation || ""}`;
+      })
+      .join("\n");
+
+    systemPrompt += `\n\n## Market Intelligence Context\nRelevant market signals found:\n${marketContext}\n\nReference this data when advising on market fit and competition. These signals are from real Reddit posts and product reviews.`;
+  }
+
+  // Update session's current_phase
+  await supabase
+    .from("chat_sessions")
+    .update({ current_phase: currentPhase })
+    .eq("id", chatSessionId);
+
+  // Only provide the extraction tool in the final phase
+  const tools = currentPhase >= TOTAL_PHASES ? [extractIdeaDetailsTool] : [];
+
   // SSE stream
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
@@ -56,10 +91,15 @@ export async function POST(request: NextRequest) {
       let fullResponse = "";
       let toolCallData: { id: string; name: string; input: Record<string, unknown> } | null = null;
 
+      // Send current phase info to frontend
+      controller.enqueue(
+        encoder.encode(`data: ${JSON.stringify({ type: "phase", phase: currentPhase, total: TOTAL_PHASES })}\n\n`)
+      );
+
       await streamChat({
-        system: coachSystemPrompt,
+        system: systemPrompt,
         messages,
-        tools: [extractIdeaDetailsTool],
+        tools: tools.length > 0 ? tools : undefined,
         onText: (text) => {
           fullResponse += text;
           controller.enqueue(

@@ -29,6 +29,7 @@ export function ChatInterface({
     setMessages,
     isStreaming,
     extractedIdea,
+    currentPhase,
     sendMessage,
     stopStreaming,
   } = useChat({
@@ -66,8 +67,47 @@ export function ChatInterface({
     });
   }, [messages, isStreaming]);
 
+  const phaseLabels = ["Idea & Problem", "Target Audience", "Value Proposition", "Monetization", "Tone & CTA"];
+
   return (
     <div className="flex flex-col h-[calc(100vh-120px)]">
+      {/* Phase progress bar */}
+      {currentPhase && currentPhase.phase < currentPhase.total && (
+        <div className="px-4 pt-3 pb-1">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-center gap-2 mb-1.5">
+              {phaseLabels.map((label, i) => {
+                const step = i + 1;
+                const isComplete = currentPhase.phase > step;
+                const isCurrent = currentPhase.phase === step;
+                return (
+                  <div key={label} className="flex-1">
+                    <div
+                      className={`h-1.5 rounded-full transition-colors ${
+                        isComplete
+                          ? "bg-primary"
+                          : isCurrent
+                            ? "bg-primary/50"
+                            : "bg-muted"
+                      }`}
+                    />
+                    <p
+                      className={`text-[10px] mt-0.5 truncate ${
+                        isComplete || isCurrent
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {label}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto space-y-4">
           {messages.length === 0 && (

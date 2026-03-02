@@ -14,6 +14,7 @@ export function useChat({ projectId, sessionId: initialSessionId, onExtractionCo
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId || null);
   const [extractedIdea, setExtractedIdea] = useState<IdeaSummary | null>(null);
+  const [currentPhase, setCurrentPhase] = useState<{ phase: number; total: number } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const sendMessage = useCallback(
@@ -68,6 +69,10 @@ export function useChat({ projectId, sessionId: initialSessionId, onExtractionCo
             const data = JSON.parse(line.slice(6));
 
             switch (data.type) {
+              case "phase":
+                setCurrentPhase({ phase: data.phase, total: data.total });
+                break;
+
               case "text":
                 setMessages((prev) => {
                   const updated = [...prev];
@@ -156,6 +161,7 @@ export function useChat({ projectId, sessionId: initialSessionId, onExtractionCo
     sessionId,
     setSessionId,
     extractedIdea,
+    currentPhase,
     sendMessage,
     stopStreaming,
   };

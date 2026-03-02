@@ -5,6 +5,13 @@ interface ScoreInput {
   conversionRate: number;
   avgTimeOnPage?: number;
   bounceRate?: number;
+  marketResearch?: MarketResearchBonus;
+}
+
+interface MarketResearchBonus {
+  maxRelevanceScore: number;
+  maxOpportunityScore: number;
+  signalCount: number;
 }
 
 interface ScoreBreakdown {
@@ -13,26 +20,49 @@ interface ScoreBreakdown {
   traffic: number;
   engagement: number;
   quality: number;
+  marketBonus: number;
 }
 
 // Weights: Conversion 40%, Traffic 25%, Engagement 20%, Quality 15%
+// Market research can add up to +20 bonus points
 export function calculateValidationScore(input: ScoreInput): ScoreBreakdown {
   const conversion = calculateConversionScore(input.conversionRate, input.totalSignups);
   const traffic = calculateTrafficScore(input.totalPageViews, input.totalUniqueVisitors);
   const engagement = calculateEngagementScore(input.avgTimeOnPage, input.bounceRate);
   const quality = calculateQualityScore(input.totalSignups, input.conversionRate);
+  const marketBonus = calculateMarketBonus(input.marketResearch);
 
-  const total = Math.round(
+  const baseTotal = Math.round(
     conversion * 0.4 + traffic * 0.25 + engagement * 0.2 + quality * 0.15
   );
 
   return {
-    total: Math.min(100, Math.max(0, total)),
+    total: Math.min(100, Math.max(0, baseTotal + marketBonus)),
     conversion: Math.round(conversion),
     traffic: Math.round(traffic),
     engagement: Math.round(engagement),
     quality: Math.round(quality),
+    marketBonus,
   };
+}
+
+function calculateMarketBonus(research?: MarketResearchBonus): number {
+  if (!research) return 0;
+
+  let bonus = 0;
+
+  // Relevance > 80% → +10 points
+  if (research.maxRelevanceScore >= 80) bonus += 10;
+  else if (research.maxRelevanceScore >= 60) bonus += 5;
+
+  // Opportunity score > 70 → +5 points
+  if (research.maxOpportunityScore >= 70) bonus += 5;
+
+  // Multiple supporting demand signals → +5 points
+  if (research.signalCount >= 5) bonus += 5;
+  else if (research.signalCount >= 3) bonus += 3;
+
+  return Math.min(20, bonus);
 }
 
 function calculateConversionScore(conversionRate: number, totalSignups: number): number {

@@ -14,6 +14,8 @@ export interface PlanConfig {
     watermark: boolean;
     analytics: "basic" | "advanced";
     support: "community" | "email" | "priority";
+    marketResearch: boolean;
+    scansPerDay: number;
   };
   features: string[];
   popular?: boolean;
@@ -36,6 +38,8 @@ export const plans: PlanConfig[] = [
       watermark: true,
       analytics: "basic",
       support: "community",
+      marketResearch: false,
+      scansPerDay: 0,
     },
     features: [
       "1 validation test",
@@ -60,6 +64,8 @@ export const plans: PlanConfig[] = [
       watermark: true,
       analytics: "advanced",
       support: "email",
+      marketResearch: false,
+      scansPerDay: 0,
     },
     features: [
       "1 validation test",
@@ -88,6 +94,8 @@ export const plans: PlanConfig[] = [
       watermark: false,
       analytics: "advanced",
       support: "priority",
+      marketResearch: true,
+      scansPerDay: 3,
     },
     features: [
       "Unlimited validation tests",
@@ -100,6 +108,8 @@ export const plans: PlanConfig[] = [
       "No watermark",
       "Custom domains",
       "Priority support",
+      "SaaS Opportunity Scanner",
+      "Market Research & AI Product Briefs",
     ],
   },
 ];

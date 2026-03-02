@@ -7,6 +7,8 @@ import {
   Settings,
   CreditCard,
   Bell,
+  Radar,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 
@@ -18,6 +20,7 @@ export interface NavItem {
 
 export const platformNav: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Discover", href: "/discover", icon: Radar },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -27,6 +30,7 @@ export const projectTabs: NavItem[] = [
   { label: "Landing Page", href: "/landing-page", icon: Globe },
   { label: "Ads", href: "/ads", icon: Megaphone },
   { label: "Analytics", href: "/analytics", icon: BarChart3 },
+  { label: "Market Research", href: "/market-research", icon: TrendingUp },
 ];
 
 export const settingsNav: NavItem[] = [

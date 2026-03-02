@@ -38,6 +38,10 @@ export default function PricingPage() {
               a: "Yes, you can cancel anytime from your billing settings. You'll keep access until the end of your billing period.",
             },
             {
+              q: "What is the SaaS Opportunity Scanner?",
+              a: "Pro subscribers get access to our AI-powered market scanner that mines Reddit for demand signals and analyzes reviews from G2, Capterra, Product Hunt, and Trustpilot. It cross-references this data to score opportunities and generate actionable product briefs.",
+            },
+            {
               q: "Do I need design or coding skills?",
               a: "Not at all. AI generates everything — landing page copy, design, and ad content. You just describe your idea.",
             },

@@ -44,6 +44,20 @@ export class RateLimitError extends AppError {
   }
 }
 
+export class ScrapeError extends AppError {
+  constructor(message = "Failed to fetch external data") {
+    super(message, 502, "SCRAPE_ERROR");
+    this.name = "ScrapeError";
+  }
+}
+
+export class PlanRequiredError extends AppError {
+  constructor(plan = "Pro", feature = "this feature") {
+    super(`${plan} plan required for ${feature}`, 403, "PLAN_REQUIRED");
+    this.name = "PlanRequiredError";
+  }
+}
+
 export function errorResponse(error: unknown) {
   if (error instanceof AppError) {
     return Response.json(

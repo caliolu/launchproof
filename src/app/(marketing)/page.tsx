@@ -17,13 +17,13 @@ export default function HomePage() {
     <>
       {/* Hero */}
       <section className="flex flex-col items-center justify-center px-4 py-24 md:py-32 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm text-primary mb-6">
+        <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-4 py-1.5 text-sm text-primary mb-6">
           <Zap className="h-4 w-4" />
           Validate in 24 hours, not 24 weeks
         </div>
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight max-w-4xl mb-6">
           Test your startup idea{" "}
-          <span className="text-primary">before you build</span>
+          <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">before you build</span>
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10">
           AI-powered landing pages, ad content, and real market data.
@@ -45,7 +45,7 @@ export default function HomePage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="border-t border-border py-24 px-4">
+      <section id="features" className="bg-gradient-to-b from-background to-muted/20 py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-sm font-medium text-primary mb-2">FEATURES</p>
@@ -95,9 +95,9 @@ export default function HomePage() {
                   "No coding, no design skills needed. Go from idea to live test in under 30 minutes.",
               },
             ].map((feature) => (
-              <Card key={feature.title} className="border-border/50">
+              <Card key={feature.title} className="border-border/50 hover:-translate-y-0.5 transition-all duration-300">
                 <CardContent className="pt-6">
-                  <div className="inline-flex items-center justify-center rounded-lg bg-primary/10 p-2.5 mb-4">
+                  <div className="inline-flex items-center justify-center rounded-lg bg-gradient-to-br from-primary/10 to-purple-500/10 p-2.5 mb-4">
                     <feature.icon className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
@@ -112,7 +112,7 @@ export default function HomePage() {
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" className="border-t border-border bg-muted/30 py-24 px-4">
+      <section id="how-it-works" className="bg-muted/30 py-24 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-sm font-medium text-primary mb-2">HOW IT WORKS</p>
@@ -164,7 +164,7 @@ export default function HomePage() {
       </section>
 
       {/* Social proof / stats */}
-      <section className="border-t border-border py-20 px-4">
+      <section className="bg-gradient-to-b from-muted/20 to-background py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
@@ -183,7 +183,7 @@ export default function HomePage() {
       </section>
 
       {/* Why LaunchProof */}
-      <section className="border-t border-border bg-muted/30 py-24 px-4">
+      <section className="bg-muted/30 py-24 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-8">Why founders choose LaunchProof</h2>
           <div className="grid sm:grid-cols-2 gap-4 text-left">
@@ -205,7 +205,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="border-t border-border py-24 px-4">
+      <section className="bg-gradient-to-b from-background to-muted/20 py-24 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to validate your idea?

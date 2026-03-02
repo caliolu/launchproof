@@ -8,9 +8,9 @@ const variants = {
   default: "bg-primary text-primary-foreground",
   secondary: "bg-muted text-muted-foreground",
   outline: "border border-border text-foreground",
-  success: "bg-success/10 text-success border border-success/20",
-  warning: "bg-warning/10 text-warning border border-warning/20",
-  destructive: "bg-destructive/10 text-destructive border border-destructive/20",
+  success: "bg-success/15 text-success border border-success/20 backdrop-blur-sm",
+  warning: "bg-warning/15 text-warning border border-warning/20 backdrop-blur-sm",
+  destructive: "bg-destructive/15 text-destructive border border-destructive/20 backdrop-blur-sm",
 };
 
 export function Badge({ className, variant = "default", ...props }: BadgeProps) {

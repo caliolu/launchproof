@@ -19,12 +19,18 @@ export function PlatformHeader({
   const plan = getPlan(profile?.plan || "free");
 
   return (
-    <header className="border-b border-border bg-card px-6 py-4">
+    <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border/50 px-6 py-4">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-semibold">{title}</h1>
-            <Badge variant="secondary">{plan.name}</Badge>
+            {plan.name === "Pro" ? (
+              <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent border border-primary/20">
+                {plan.name}
+              </span>
+            ) : (
+              <Badge variant="secondary">{plan.name}</Badge>
+            )}
           </div>
           {description && (
             <p className="text-sm text-muted-foreground mt-1">{description}</p>

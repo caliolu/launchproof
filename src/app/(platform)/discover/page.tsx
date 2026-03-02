@@ -57,7 +57,7 @@ export default function DiscoverPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Discover Opportunities</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">Discover Opportunities</h1>
           <p className="text-muted-foreground mt-1">
             AI-powered market intelligence from Reddit and review platforms
           </p>
@@ -65,7 +65,7 @@ export default function DiscoverPage() {
         <button
           onClick={() => setShowScanDialog(true)}
           disabled={isScanning}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium text-sm cursor-pointer hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-purple-500 text-primary-foreground font-medium text-sm cursor-pointer hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0"
         >
           <Radar className="h-4 w-4" />
           {isScanning ? "Scanning..." : "New Scan"}
@@ -114,7 +114,7 @@ export default function DiscoverPage() {
           action={
             <button
               onClick={() => setShowScanDialog(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium text-sm cursor-pointer hover:bg-primary/90"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-purple-500 text-primary-foreground font-medium text-sm cursor-pointer hover:brightness-110 transition-all"
             >
               <Radar className="h-4 w-4" />
               Run First Scan
@@ -126,7 +126,7 @@ export default function DiscoverPage() {
           <p className="text-sm text-muted-foreground mb-4">
             {total} {total === 1 ? "opportunity" : "opportunities"} found
           </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {opportunities.map((opp) => (
               <OpportunityCard
                 key={opp.id}

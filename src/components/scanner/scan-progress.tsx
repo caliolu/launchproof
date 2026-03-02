@@ -60,12 +60,12 @@ export function ScanProgress({ events, isRunning }: ScanProgressProps) {
         {isRunning && latestEvent?.current && latestEvent?.total && (
           <div className="mb-4">
             <div className="flex justify-between text-xs text-muted-foreground mb-1">
-              <span>{latestEvent.step?.replace(/_/g, " ")}</span>
+              <span className="text-xs font-medium">{latestEvent.step?.replace(/_/g, " ")}</span>
               <span>{latestEvent.current}/{latestEvent.total}</span>
             </div>
             <div className="h-2 rounded-full bg-muted overflow-hidden">
               <div
-                className="h-full rounded-full bg-primary transition-all duration-300"
+                className="h-full rounded-full bg-gradient-to-r from-primary to-purple-500 transition-all duration-300 shadow-[2px_0_8px_rgba(99,102,241,0.4)]"
                 style={{ width: `${(latestEvent.current / latestEvent.total) * 100}%` }}
               />
             </div>

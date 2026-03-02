@@ -27,7 +27,7 @@ export function OpportunityCard({ opportunity, onToggleFavorite }: OpportunityCa
   const isFavorite = opportunity.annotation?.is_favorite ?? false;
 
   return (
-    <Card className="hover:border-primary/50 transition-colors group">
+    <Card className="hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 group">
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
@@ -41,7 +41,7 @@ export function OpportunityCard({ opportunity, onToggleFavorite }: OpportunityCa
             </CardDescription>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Badge variant={scoreBadgeVariant(opportunity.composite_score)}>
+            <Badge variant={scoreBadgeVariant(opportunity.composite_score)} className={opportunity.composite_score >= 70 ? "ring-2 ring-primary/20" : ""}>
               <TrendingUp className="h-3 w-3 mr-1" />
               {Math.round(opportunity.composite_score)}
             </Badge>
@@ -64,7 +64,7 @@ export function OpportunityCard({ opportunity, onToggleFavorite }: OpportunityCa
       </CardHeader>
       <CardContent>
         <div className="flex flex-wrap items-center gap-2 mb-3">
-          <Badge variant="outline">{opportunity.category}</Badge>
+          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">{opportunity.category}</Badge>
           {(opportunity.tags as string[] || []).slice(0, 2).map((tag) => (
             <Badge key={tag} variant="secondary">{tag}</Badge>
           ))}

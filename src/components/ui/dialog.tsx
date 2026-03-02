@@ -35,10 +35,10 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
         if (e.target === overlayRef.current) onClose();
       }}
     >
-      <div className="fixed inset-0 bg-black/50" />
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
       <div
         className={cn(
-          "relative z-50 w-full max-w-lg rounded-xl bg-card p-6 shadow-xl animate-[fadeIn_0.15s_ease-out]",
+          "relative z-50 w-full max-w-lg rounded-xl bg-card p-6 shadow-xl animate-[scale-in_0.2s_ease-out]",
           className
         )}
       >

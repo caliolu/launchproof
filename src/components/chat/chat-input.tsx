@@ -31,15 +31,15 @@ export function ChatInput({ onSend, onStop, isStreaming, disabled }: ChatInputPr
   }
 
   return (
-    <form onSubmit={handleSubmit} className="border-t border-border p-4 bg-card">
-      <div className="flex gap-2 items-end max-w-3xl mx-auto">
+    <form onSubmit={handleSubmit} className="p-4 bg-card">
+      <div className="flex gap-2 items-end max-w-3xl mx-auto bg-card rounded-2xl border border-border/50 shadow-sm p-2 focus-within:ring-1 focus-within:ring-primary/20 transition-shadow">
         <textarea
           ref={textareaRef}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Describe your idea..."
-          className="flex-1 resize-none rounded-xl border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring min-h-[48px] max-h-[200px]"
+          className="flex-1 resize-none rounded-xl bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none min-h-[44px] max-h-[200px]"
           rows={1}
           disabled={disabled}
         />
@@ -48,7 +48,7 @@ export function ChatInput({ onSend, onStop, isStreaming, disabled }: ChatInputPr
             <Square className="h-4 w-4" />
           </Button>
         ) : (
-          <Button type="submit" size="icon" disabled={!value.trim() || disabled}>
+          <Button type="submit" size="icon" disabled={!value.trim() || disabled} className="bg-gradient-to-r from-primary to-purple-500 hover:brightness-110">
             <Send className="h-4 w-4" />
           </Button>
         )}

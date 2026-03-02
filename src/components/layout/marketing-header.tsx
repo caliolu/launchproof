@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export function MarketingHeader() {
   return (
-    <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-50">
+    <header className="border-b border-border/50 sticky top-0 bg-background/80 backdrop-blur-lg shadow-sm z-50">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <img src="/logo.svg" alt="" className="h-8 w-8" />

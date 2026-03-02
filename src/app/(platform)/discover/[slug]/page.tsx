@@ -151,7 +151,7 @@ export default function OpportunityDetailPage() {
         </Link>
         <button
           onClick={handleCreateProject}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium text-sm cursor-pointer hover:bg-primary/90"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-purple-500 text-primary-foreground font-medium text-sm cursor-pointer hover:brightness-110 shadow-[var(--shadow-glow)] transition-all"
         >
           <Plus className="h-4 w-4" />
           Create Project
@@ -177,7 +177,7 @@ export default function OpportunityDetailPage() {
                 </h4>
                 <div className="space-y-3">
                   {signals.reddit.map((signal) => (
-                    <div key={signal.id} className="rounded-lg border border-border p-3">
+                    <div key={signal.id} className="rounded-lg border border-border/50 p-3 hover:bg-muted/50 transition-colors">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <a
@@ -214,7 +214,7 @@ export default function OpportunityDetailPage() {
                 </h4>
                 <div className="space-y-3">
                   {signals.reviews.map((signal) => (
-                    <div key={signal.id} className="rounded-lg border border-border p-3">
+                    <div key={signal.id} className="rounded-lg border border-border/50 p-3 hover:bg-muted/50 transition-colors">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium">{signal.product_name}</p>

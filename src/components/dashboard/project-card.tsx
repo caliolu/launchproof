@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils/cn";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -46,7 +47,7 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
 
   return (
     <Link href={`/project/${project.id}`}>
-      <Card className="hover:border-primary/50 transition-colors cursor-pointer">
+      <Card className="hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 cursor-pointer">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
@@ -75,7 +76,7 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <div className="flex items-center gap-4">
               {project.validation_score !== null && (
-                <span className="flex items-center gap-1">
+                <span className={cn("flex items-center gap-1", project.validation_score > 70 && "text-success")}>
                   <BarChart3 className="h-3.5 w-3.5" />
                   {project.validation_score}/100
                 </span>

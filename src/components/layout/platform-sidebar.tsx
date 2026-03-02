@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
 import { platformNav } from "@/config/navigation";
-import { Plus, LogOut } from "lucide-react";
+import { Plus, LogOut, Menu, X } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { useRouter } from "next/navigation";
 
@@ -12,6 +13,7 @@ export function PlatformSidebar() {
   const pathname = usePathname();
   const { profile, signOut } = useUser();
   const router = useRouter();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   async function handleSignOut() {
     await signOut();
@@ -19,10 +21,10 @@ export function PlatformSidebar() {
     router.refresh();
   }
 
-  return (
-    <aside className="flex flex-col w-64 border-r border-border bg-card h-screen sticky top-0">
-      <div className="p-4 border-b border-border">
-        <Link href="/dashboard" className="flex items-center gap-2">
+  const sidebarContent = (
+    <>
+      <div className="p-4 border-b border-border/50">
+        <Link href="/dashboard" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
           <img src="/logo.svg" alt="" className="h-7 w-7" />
           <span className="text-lg font-bold">Launch<span className="text-primary">Proof</span></span>
         </Link>
@@ -33,10 +35,11 @@ export function PlatformSidebar() {
           <Link
             key={item.href}
             href={item.href}
+            onClick={() => setMobileOpen(false)}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               pathname === item.href
-                ? "bg-primary/10 text-primary"
+                ? "bg-primary/10 text-primary border-l-2 border-primary"
                 : "text-muted-foreground hover:bg-accent hover:text-foreground"
             )}
           >
@@ -47,6 +50,7 @@ export function PlatformSidebar() {
 
         <Link
           href="/project/new"
+          onClick={() => setMobileOpen(false)}
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
         >
           <Plus className="h-4 w-4" />
@@ -54,7 +58,7 @@ export function PlatformSidebar() {
         </Link>
       </nav>
 
-      <div className="p-3 border-t border-border">
+      <div className="p-3 border-t border-border/50">
         <div className="flex items-center gap-3 px-3 py-2">
           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
             {profile?.full_name?.[0] || profile?.email?.[0] || "?"}
@@ -76,6 +80,49 @@ export function PlatformSidebar() {
           </button>
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger button */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="fixed top-3 left-3 z-40 md:hidden p-2 rounded-lg bg-card border border-border/50 shadow-sm cursor-pointer"
+        aria-label="Open menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile sidebar */}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex flex-col w-64 backdrop-blur-md bg-background/95 border-r border-border/50 h-screen transition-transform duration-300 md:hidden",
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="absolute top-4 right-4 p-1 text-muted-foreground hover:text-foreground cursor-pointer"
+          aria-label="Close menu"
+        >
+          <X className="h-4 w-4" />
+        </button>
+        {sidebarContent}
+      </aside>
+
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex flex-col w-64 border-r border-border/50 bg-card h-screen sticky top-0">
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

@@ -35,9 +35,9 @@ export function ScoreBreakdown({
     <div className={cn("space-y-4", className)}>
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-semibold">Score Breakdown</h4>
-        <span className="text-2xl font-bold tabular-nums">
+        <span className={cn("text-2xl font-bold tabular-nums", composite >= 70 && "bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent")}>
           {Math.round(composite)}
-          <span className="text-sm font-normal text-muted-foreground">/100</span>
+          <span className={cn("text-sm font-normal", composite >= 70 ? "text-purple-400" : "text-muted-foreground")}>/100</span>
         </span>
       </div>
 
@@ -50,9 +50,9 @@ export function ScoreBreakdown({
                 <span className="text-muted-foreground">{dim.label}</span>
                 <span className="font-medium tabular-nums">{Math.round(value)}</span>
               </div>
-              <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div className="h-2 rounded-full bg-muted/80 overflow-hidden">
                 <div
-                  className={cn("h-full rounded-full transition-all duration-500", dim.color)}
+                  className={cn("h-full rounded-full transition-all duration-700 ease-out", dim.color)}
                   style={{ width: `${Math.min(100, value)}%` }}
                 />
               </div>

@@ -85,14 +85,20 @@ export function PlatformSidebar() {
 
   return (
     <>
-      {/* Mobile hamburger button */}
-      <button
-        onClick={() => setMobileOpen(true)}
-        className="fixed top-3 left-3 z-40 md:hidden p-2 rounded-lg bg-card border border-border/50 shadow-sm cursor-pointer"
-        aria-label="Open menu"
-      >
-        <Menu className="h-5 w-5" />
-      </button>
+      {/* Mobile top bar */}
+      <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border/50 bg-background/80 backdrop-blur-md px-4 h-14 md:hidden">
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="p-1.5 rounded-lg hover:bg-accent cursor-pointer"
+          aria-label="Open menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <img src="/logo.svg" alt="" className="h-6 w-6" />
+          <span className="text-base font-bold">Launch<span className="text-primary">Proof</span></span>
+        </Link>
+      </div>
 
       {/* Mobile overlay */}
       {mobileOpen && (

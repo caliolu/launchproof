@@ -14,8 +14,8 @@ export function ProjectTabs({ projectId }: ProjectTabsProps) {
   const basePath = `/project/${projectId}`;
 
   return (
-    <nav className="border-b border-border bg-card px-6">
-      <div className="flex gap-1 -mb-px">
+    <nav className="border-b border-border bg-card px-6 overflow-x-auto scrollbar-none">
+      <div className="flex gap-1 -mb-px min-w-max">
         {projectTabs.map((tab) => {
           const href = `${basePath}${tab.href}`;
           const isActive =

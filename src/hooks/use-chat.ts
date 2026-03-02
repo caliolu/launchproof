@@ -69,6 +69,10 @@ export function useChat({ projectId, sessionId: initialSessionId, onExtractionCo
             const data = JSON.parse(line.slice(6));
 
             switch (data.type) {
+              case "session":
+                setSessionId(data.sessionId);
+                break;
+
               case "phase":
                 setCurrentPhase({ phase: data.phase, total: data.total });
                 break;

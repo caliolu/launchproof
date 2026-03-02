@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { streamChat } from "@/lib/ai/claude-client";
+import { coachSystemPrompt } from "@/lib/ai/prompts/coach-system";
 import { phasePrompts, TOTAL_PHASES } from "@/lib/ai/prompts/coach-phases";
 import { extractIdeaDetailsTool } from "@/lib/ai/tools/idea-extraction";
 import { ideaSummarySchema } from "@/lib/ai/schemas/idea-schema";
@@ -53,7 +54,8 @@ export async function POST(request: NextRequest) {
   // Phase 1: 1st user msg, Phase 2: 2nd user msg, ... Phase 6: 6th user msg (extraction)
   const userMessageCount = messages.filter((m) => m.role === "user").length;
   const currentPhase = Math.min(userMessageCount, TOTAL_PHASES);
-  let systemPrompt = phasePrompts[currentPhase] || phasePrompts[TOTAL_PHASES];
+  const phaseInstruction = phasePrompts[currentPhase] || phasePrompts[TOTAL_PHASES];
+  let systemPrompt = `${coachSystemPrompt}\n\n## CURRENT PHASE INSTRUCTION (Phase ${currentPhase} of ${TOTAL_PHASES})\n${phaseInstruction}`;
 
   // Inject market intelligence context if available
   const { data: marketResearch } = await supabase
@@ -90,6 +92,11 @@ export async function POST(request: NextRequest) {
     async start(controller) {
       let fullResponse = "";
       let toolCallData: { id: string; name: string; input: Record<string, unknown> } | null = null;
+
+      // Send session ID so frontend can track it
+      controller.enqueue(
+        encoder.encode(`data: ${JSON.stringify({ type: "session", sessionId: chatSessionId })}\n\n`)
+      );
 
       // Send current phase info to frontend
       controller.enqueue(
